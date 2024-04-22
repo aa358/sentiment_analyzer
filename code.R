@@ -41,9 +41,13 @@ analyze_sentiment <- function(sentence, afinn_lexicon, negation_terms) {
 # Example usage
 text1 <- "I love this movie! It's fantastic."
 text2 <- "This is a very bad movie. I loved it!"
-text3 <- "I'm feeling really happy today!"
-text4 <- "The weather is terrible. I hate rainy days."
-text5 <- "I'm thrilled to hear the news! It's fantastic!"
+text3 <- "The weather is terrible. I hate rainy days."
+text4 <- "I'm thrilled to hear the news! It's fantastic!"
+
+# Test for Negation
+text5 <- "I'm feeling really happy today!"
+text6 <- "I'm not feeling really happy today!"
+
 sentiment_score <- analyze_sentiment(text1, afinn, negation_terms)
 print(sentiment_score)
 sentiment_score <- analyze_sentiment(text2, afinn, negation_terms)
@@ -53,4 +57,6 @@ print(sentiment_score)
 sentiment_score <- analyze_sentiment(text4, afinn, negation_terms)
 print(sentiment_score)
 sentiment_score <- analyze_sentiment(text5, afinn, negation_terms)
+print(sentiment_score)
+sentiment_score <- analyze_sentiment(text6, afinn, negation_terms)
 print(sentiment_score)
