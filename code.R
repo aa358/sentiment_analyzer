@@ -64,9 +64,16 @@ print(sentiment_score)
 # Load the data from Data.csv
 data <- read.csv("~/IS392 Final Project/sentiment_analyzer/Data.csv")
 
+# Initialize a list to store the text data
+text_list <- list()
+
 # Extract the text data from the specified column and rows
-text_data <- as.character(data[1:10, 9])
+for (i in 1:10) {
+  text_list[[paste0("text", i)]] <- as.character(data[i, 9])
+}
 
 # Print the text data
-cat(text_data, sep = "\n")
+for (i in 1:10) {
+  cat(paste("text", i, ": ", text_list[[paste0("text", i)]], sep = "\n"), "\n")
+}
 
