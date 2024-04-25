@@ -60,3 +60,13 @@ sentiment_score <- analyze_sentiment(text5, afinn, negation_terms)
 print(sentiment_score)
 sentiment_score <- analyze_sentiment(text6, afinn, negation_terms)
 print(sentiment_score)
+
+# Load the data from Data.csv
+data <- read.csv("~/IS392 Final Project/sentiment_analyzer/Data.csv")
+
+# Extract the text data from the specified column and rows
+text_data <- as.character(data[1:10, 9])
+
+# Print the text data
+cat(text_data, sep = "\n")
+
