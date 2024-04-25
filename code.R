@@ -2,6 +2,7 @@
 script_directory <- dirname(rstudioapi::getActiveDocumentContext()$path)
 positive_file <- file.path(script_directory, "positive_words.txt")
 negative_file <- file.path(script_directory, "negative_words.txt")
+data_file <- file.path(script_directory, "Data.csv")
 
 # Function to read word file
 read_word_file <- function(file_name) {
@@ -49,13 +50,10 @@ analyze_sentiment <- function(text) {
   }
 }
 
-# Loop to get user input
-while (TRUE) {
-  user_input <- readline("Enter a sentence (type 'exit' to quit): ")
-  if (tolower(user_input) == "exit") {
-    break
-  } else {
-    sentiment <- analyze_sentiment(user_input)
-    print(paste("Sentiment:", sentiment))
-  }
+# Read sentences from data file and analyze sentiment
+data_sentences <- readLines(data_file)
+for (sentence in data_sentences) {
+  sentiment <- analyze_sentiment(sentence)
+  print(paste("Sentence:", sentence))
+  print(paste("Sentiment:", sentiment))
 }
