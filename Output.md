@@ -1,6 +1,7 @@
 Sentiment scores for first 500 lines of the Test Data File
 
-Sentiment score for text 1 : -2 
+Sentiment score for text 1 : -2
+
 Sentiment score for text 2 : -2 
 Sentiment score for text 3 : -4 
 Sentiment score for text 4 : -2 
