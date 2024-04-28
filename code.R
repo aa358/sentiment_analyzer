@@ -1,19 +1,22 @@
-# Make sure your Data.csv file is saved under same directory 
+# Make sure your Data.csv file is saved under the same directory 
+
 # Install required package
 install.packages("sentimentr")
-
-# Load required libraries
-library(data.table)
 library(sentimentr)
+library(data.table)
 
 # Define function for sentiment analysis
 analyze_sentiment <- function(text) {
-  if (is.character(text)) {
-    sentiment_score <- sentiment(text)$sentiment
-    return(sentiment_score)
-  } else {
-    return(0)  # Return 0 sentiment score for NA or non-string values
-  }
+  sentences <- get_sentences(text)
+  sentiment_scores <- sapply(sentences, function(sentence) {
+    if (is.character(sentence)) {
+      sentiment_score <- sentiment(sentence)$sentiment
+      return(sentiment_score)
+    } else {
+      return(0)  # Return 0 sentiment score for NA or non-string values
+    }
+  })
+  return(mean(sentiment_scores))  # Return average sentiment score for all sentences
 }
 
 # Define function for aspect-based sentiment analysis
@@ -30,7 +33,7 @@ aspect_sentiment_analysis <- function(data) {
     )
     results[[i]] <- result
   }
-  return(rbindlist(results))
+  return(as.data.frame(do.call(rbind, results)))
 }
 
 # Define main function
@@ -39,16 +42,20 @@ main <- function() {
   tryCatch({
     data <- fread("Data.csv")
   }, error = function(e) {
-    cat("Data.csv not found in the current directory.\n")
+    cat("Please Wait.... \n")
     return()
   })
   
   # Perform aspect-based sentiment analysis
   analyzed_data <- aspect_sentiment_analysis(data)
   
-  # Display results
-  cat("Aspect-Based Sentiment Analysis Results:\n")
-  print(analyzed_data)
+  # Save results to a separate file
+  output_file <- "aspect_sentiment_analysis_results.csv"
+  fwrite(analyzed_data, file = output_file)
+  cat("Aspect-Based Sentiment Analysis Results saved to ", output_file, "\n")
+  
+  # Print number of rows written to the output file
+  cat("Number of rows written to the output file: ", nrow(analyzed_data), "\n")
 }
 
 # Execute main function
