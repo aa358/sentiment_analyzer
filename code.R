@@ -1,7 +1,7 @@
-# Make sure your Data.csv file is saved under the same directory 
-
-# Install required package 
-install.packages("sentimentr") # Remove it after installing package
+# Make sure you have input.csv
+# Install required packages
+install.packages("sentimentr") #remove it after installing it
+install.packages("data.table") # remove aftr installig it
 library(sentimentr)
 library(data.table)
 
@@ -25,7 +25,7 @@ aspect_sentiment_analysis <- function(data) {
   for (i in 1:nrow(data)) {
     text <- as.character(data[i, "commentsReview"])
     aspect <- as.character(data[i, "urlDrugName"])
-    sentiment_score <- analyze_sentiment(text)
+    sentiment_score <- round(analyze_sentiment(text), 2) # Round to two decimal places
     result <- list(
       'Text' = text,
       'Aspect' = aspect,
@@ -38,26 +38,32 @@ aspect_sentiment_analysis <- function(data) {
 
 # Define main function
 main <- function() {
+  # Set working directory to current directory
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  
   # Load data from CSV
   tryCatch({
-    data <- fread("Data.csv")
+    data <- fread("input.csv")
     cat("Please Wait.... \n")
   }, error = function(e) {
-    cat("Please Wait.... \n")
-    
+    cat("Please Wait...... \n")
     return()
   })
   
-  # Perform aspect-based sentiment analysis
-  analyzed_data <- aspect_sentiment_analysis(data)
-  
-  # Save results to a separate file
-  output_file <- "aspect_sentiment_analysis_results.csv"
-  fwrite(analyzed_data, file = output_file)
-  cat("Aspect-Based Sentiment Analysis Results saved to ", output_file, "\n")
-  
-  # Print number of rows written to the output file
-  cat("Number of rows written to the output file: ", nrow(analyzed_data), "\n")
+  # Perform aspect-based sentiment analysis if data loaded successfully
+  if (exists("data")) {
+    analyzed_data <- aspect_sentiment_analysis(data)
+    
+    # Save results to a separate file in the current working directory
+    output_file <- "aspect_sentiment_analysis_results.csv"
+    fwrite(analyzed_data, file.path(getwd(), output_file))
+    cat("Aspect-Based Sentiment Analysis Results saved to ", output_file, "\n")
+    
+    # Print number of rows written to the output file
+    cat("Number of rows written to the output file: ", nrow(analyzed_data), "\n")
+  } else {
+    cat("No data loaded. Exiting... \n")
+  }
 }
 
 # Execute main function
