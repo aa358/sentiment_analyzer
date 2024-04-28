@@ -65,6 +65,28 @@ for (i in 1:500) {
   cat(paste("Sentiment score for text", i, ":", sentiment_scores[i]), "\n")
 }
 
+positive <- sum(sentiment_scores > 0)
+negative <- sum(sentiment_scores < 0)
+neutral <- sum(sentiment_scores == 0)
+total <- length(sentiment_scores)
+cat("Proportion of positive sentiments:", positive / total, "\n")
+cat("Proportion of negative sentiments:", negative / total, "\n")
+cat("Proportion of neutral sentiments:", neutral / total, "\n")
+
+min_sentiment_score <- min(sentiment_scores)
+max_sentiment_score <- max(sentiment_scores)
+cat("Minimum sentiment score:", min_sentiment_score, "\n")
+cat("Maximum sentiment score:", max_sentiment_score, "\n")
+
+# Calculate the mean of the sentiment scores
+mean_sentiment_score <- mean(sentiment_scores)
+
+# Print the mean sentiment score
+cat("Mean sentiment score:", mean_sentiment_score, "\n")
+
+sd_sentiment_score <- sd(sentiment_scores)
+cat("Standard deviation of sentiment scores:", sd_sentiment_score, "\n")
+
 #Test to verify scores of each individual variable
 test1 <- "This drug may not be for everyone but its wonderful for me! It makes me a totally different person, a better person."
 sentiment_score <- analyze_sentiment(test1, afinn, negation_terms)
