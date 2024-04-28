@@ -1,4 +1,4 @@
-# Make sure your Data.csv file is saved under the same directory 
+# Make sure your Data.csv file is saved under the same directory as R
 
 # Install required package
 install.packages("sentimentr")
