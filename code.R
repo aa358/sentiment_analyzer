@@ -28,10 +28,12 @@ analyze_sentiment <- function(sentence, afinn_lexicon, negation_terms) {
     if (word %in% afinn_lexicon$word) {
       if (negation_flag) {
         sentiment_score <- sentiment_score - afinn_lexicon$score[afinn_lexicon$word == word]
+        negation_flag <- FALSE  # Reset negation flag
       } else {
         sentiment_score <- sentiment_score + afinn_lexicon$score[afinn_lexicon$word == word]
       }
-    }
+    } 
+    # Words not in the lexicon are treated as neutral
   }
   
   # Return the sentiment score
