@@ -1,7 +1,7 @@
 # Make sure your Data.csv file is saved under the same directory 
 
-# Install required package
-install.packages("sentimentr")
+# Install required package 
+install.packages("sentimentr") # Remove it after installing package
 library(sentimentr)
 library(data.table)
 
@@ -41,8 +41,10 @@ main <- function() {
   # Load data from CSV
   tryCatch({
     data <- fread("Data.csv")
+    cat("Please Wait.... \n")
   }, error = function(e) {
     cat("Please Wait.... \n")
+    
     return()
   })
   
