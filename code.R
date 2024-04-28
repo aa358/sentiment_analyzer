@@ -87,6 +87,8 @@ cat("Mean sentiment score:", mean_sentiment_score, "\n")
 sd_sentiment_score <- sd(sentiment_scores)
 cat("Standard deviation of sentiment scores:", sd_sentiment_score, "\n")
 
+hist(sentiment_scores, breaks = 50, main = "Histogram of Sentiment Scores", xlab = "Sentiment Score", ylab = "Frequency")
+
 #Test to verify scores of each individual variable
 test1 <- "This drug may not be for everyone but its wonderful for me! It makes me a totally different person, a better person."
 sentiment_score <- analyze_sentiment(test1, afinn, negation_terms)
