@@ -1,59 +1,55 @@
-# Construct file paths
-script_directory <- dirname(rstudioapi::getActiveDocumentContext()$path)
-positive_file <- file.path(script_directory, "positive_words.txt")
-negative_file <- file.path(script_directory, "negative_words.txt")
-data_file <- file.path(script_directory, "Data.csv")
+# Make sure your Data.csv file is saved under same directory 
+# Install required package
+install.packages("sentimentr")
 
-# Function to read word file
-read_word_file <- function(file_name) {
-  words <- readLines(file_name, warn = FALSE)
-  words <- iconv(words, "UTF-8", "ASCII", sub = "byte")
-  words <- tolower(words)
-  return(words)
-}
+# Load required libraries
+library(data.table)
+library(sentimentr)
 
-# Read positive and negative word files
-positive_words <- read_word_file(positive_file)
-negative_words <- read_word_file(negative_file)
-
-# Function to analyze sentiment
+# Define function for sentiment analysis
 analyze_sentiment <- function(text) {
-  words <- tolower(strsplit(text, "\\s+")[[1]])
-  sentiment_score <- 0
-  
-  for (i in seq_along(words)) {
-    word <- words[i]
-    if (word %in% positive_words) {
-      sentiment_score <- sentiment_score + 1
-    } else if (word %in% negative_words) {
-      sentiment_score <- sentiment_score - 1
-    }
-    
-    if (word %in% c("not", "no", "never")) {
-      if (i + 1 <= length(words)) {
-        next_word <- words[i + 1]
-        if (next_word %in% positive_words) {
-          sentiment_score <- sentiment_score - 1
-        } else if (next_word %in% negative_words) {
-          sentiment_score <- sentiment_score + 1
-        }
-      }
-    }
-  }
-  
-  if (sentiment_score > 0) {
-    return("Positive")
-  } else if (sentiment_score < 0) {
-    return("Negative")
+  if (is.character(text)) {
+    sentiment_score <- sentiment(text)$sentiment
+    return(sentiment_score)
   } else {
-    return("Neutral")
+    return(0)  # Return 0 sentiment score for NA or non-string values
   }
 }
 
-# Read sentences from data file and analyze sentiment
-data_sentences <- readLines(data_file)
-for (sentence in data_sentences) {
-  sentiment <- analyze_sentiment(sentence)
-  print(paste("Sentence:", sentence))
-  print(paste("Sentiment:", sentiment))
+# Define function for aspect-based sentiment analysis
+aspect_sentiment_analysis <- function(data) {
+  results <- list()
+  for (i in 1:nrow(data)) {
+    text <- as.character(data[i, "commentsReview"])
+    aspect <- as.character(data[i, "urlDrugName"])
+    sentiment_score <- analyze_sentiment(text)
+    result <- list(
+      'Text' = text,
+      'Aspect' = aspect,
+      'Sentiment_Score' = sentiment_score
+    )
+    results[[i]] <- result
+  }
+  return(rbindlist(results))
 }
+
+# Define main function
+main <- function() {
+  # Load data from CSV
+  tryCatch({
+    data <- fread("Data.csv")
+  }, error = function(e) {
+    cat("Data.csv not found in the current directory.\n")
+    return()
+  })
+  
+  # Perform aspect-based sentiment analysis
+  analyzed_data <- aspect_sentiment_analysis(data)
+  
+  # Display results
+  cat("Aspect-Based Sentiment Analysis Results:\n")
+  print(analyzed_data)
+}
+
+# Execute main function
+main()
