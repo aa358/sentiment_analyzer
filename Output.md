@@ -1,4 +1,16 @@
-Sentiment scores for first 500 lines of the Test Data File
+Info about the sentiment scores for first 500 lines of the Test Data File:
+
+Proportion of positive sentiments: 0.316 
+Proportion of negative sentiments: 0.334 
+Proportion of neutral sentiments: 0.35 
+
+Minimum sentiment score: -28 
+Maximum sentiment score: 17 
+
+Mean sentiment score: -0.192 
+Standard deviation of sentiment scores: 3.455288 
+
+Raw Output:
 
 Sentiment score for text 1 : -2
 Sentiment score for text 2 : -2 
