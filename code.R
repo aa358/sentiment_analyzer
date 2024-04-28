@@ -43,22 +43,25 @@ analyze_sentiment <- function(sentence, afinn_lexicon, negation_terms) {
 # Load the data from Data.csv
 data <- read.csv("~/IS392 Final Project/sentiment_analyzer/Data.csv")
 
+# Extract the text data from the specified column and first 500 rows
+text_data <- as.character(data[1:500, 9])
+
 # Initialize a list to store the text data
 text_list <- list()
 
-# Extract the text data from the specified column and rows
-for (i in 1:10) {
-  text_list[[paste0("text", i)]] <- as.character(data[i, 9])
+# Store the text data in a list
+for (i in 1:500) {
+  text_list[[paste0("text", i)]] <- text_data[i]
 }
 
 # Analyze sentiment for each text
 sentiment_scores <- numeric(length(text_list))
-for (i in 1:10) {
+for (i in 1:500) {
   sentiment_scores[i] <- analyze_sentiment(text_list[[paste0("text", i)]], afinn, negation_terms)
 }
 
 # Print the sentiment scores
-for (i in 1:10) {
+for (i in 1:500) {
   cat(paste("Sentiment score for text", i, ":", sentiment_scores[i]), "\n")
 }
 
