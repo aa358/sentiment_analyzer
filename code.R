@@ -1,6 +1,4 @@
-# Load AFINN lexicon
-afinn <- read.delim("https://raw.githubusercontent.com/fnielsen/afinn/master/afinn/data/AFINN-en-165.txt", header = FALSE, sep = "\t", col.names = c("word", "score"))
-
+#MAke sure to have input.csv in your working directory
 # Define negation terms
 negation_terms <- c("not", "no", "never")
 
