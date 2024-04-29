@@ -1,70 +1,89 @@
-# Make sure you have input.csv
-# Install required packages
-install.packages("sentimentr") #remove it after installing it
-install.packages("data.table") # remove aftr installig it
-library(sentimentr)
-library(data.table)
+# Load AFINN lexicon
+afinn <- read.delim("https://raw.githubusercontent.com/fnielsen/afinn/master/afinn/data/AFINN-en-165.txt", header = FALSE, sep = "\t", col.names = c("word", "score"))
 
-# Define function for sentiment analysis
-analyze_sentiment <- function(text) {
-  sentences <- get_sentences(text)
-  sentiment_scores <- sapply(sentences, function(sentence) {
-    if (is.character(sentence)) {
-      sentiment_score <- sentiment(sentence)$sentiment
-      return(sentiment_score)
-    } else {
-      return(0)  # Return 0 sentiment score for NA or non-string values
+# Define negation terms
+negation_terms <- c("not", "no", "never")
+
+# Function to analyze sentiment with negation handling
+analyze_sentiment <- function(text, aspect, afinn_lexicon, negation_terms) {
+  # Tokenize the text into sentences
+  sentences <- unlist(strsplit(tolower(text), "[.!?]"))
+  
+  # Initialize sentiment score
+  sentiment_scores <- numeric(length(sentences))
+  
+  # Calculate sentiment score for each sentence
+  for (i in 1:length(sentences)) {
+    words <- unlist(strsplit(sentences[i], "\\s+"))
+    sentiment_score <- 0
+    negation_flag <- FALSE
+    
+    # Calculate sentiment score for each word
+    for (word in words) {
+      # Check for negation terms
+      if (word %in% negation_terms) {
+        negation_flag <- TRUE
+      }
+      
+      # Adjust sentiment score based on negation
+      if (word %in% afinn_lexicon$word) {
+        if (negation_flag) {
+          sentiment_score <- sentiment_score - afinn_lexicon$score[afinn_lexicon$word == word]
+          negation_flag <- FALSE  # Reset negation flag
+        } else {
+          sentiment_score <- sentiment_score + afinn_lexicon$score[afinn_lexicon$word == word]
+        }
+      } 
     }
-  })
-  return(mean(sentiment_scores))  # Return average sentiment score for all sentences
+    
+    # Store sentiment score for the sentence
+    sentiment_scores[i] <- sentiment_score
+  }
+  
+  # Return the sum of sentiment scores for all sentences
+  return(sum(sentiment_scores))
 }
 
-# Define function for aspect-based sentiment analysis
-aspect_sentiment_analysis <- function(data) {
-  results <- list()
+# Load the data from input.csv
+data <- read.csv("input.csv")
+
+# Function for aspect-based sentiment analysis
+aspect_sentiment_analysis <- function(data, afinn_lexicon, negation_terms) {
+  results <- data.frame()
+  
   for (i in 1:nrow(data)) {
     text <- as.character(data[i, "commentsReview"])
     aspect <- as.character(data[i, "urlDrugName"])
-    sentiment_score <- round(analyze_sentiment(text), 2) # Round to two decimal places
-    result <- list(
-      'Text' = text,
-      'Aspect' = aspect,
-      'Sentiment_Score' = sentiment_score
+    
+    # Analyze sentiment for the text and aspect
+    sentiment_score <- analyze_sentiment(text, aspect, afinn_lexicon, negation_terms)
+    
+    # Append results
+    result <- data.frame(
+      Text = text,
+      Aspect = aspect,
+      Sentiment_Score = sentiment_score
     )
-    results[[i]] <- result
+    results <- rbind(results, result)
   }
-  return(as.data.frame(do.call(rbind, results)))
+  
+  return(results)
 }
 
-# Define main function
-main <- function() {
-  # Set working directory to current directory
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-  
-  # Load data from CSV
-  tryCatch({
-    data <- fread("input.csv")
-    cat("Please Wait.... \n")
-  }, error = function(e) {
-    cat("Please Wait...... \n")
-    return()
-  })
-  
-  # Perform aspect-based sentiment analysis if data loaded successfully
-  if (exists("data")) {
-    analyzed_data <- aspect_sentiment_analysis(data)
-    
-    # Save results to a separate file in the current working directory
-    output_file <- "aspect_sentiment_analysis_results.csv"
-    fwrite(analyzed_data, file.path(getwd(), output_file))
-    cat("Aspect-Based Sentiment Analysis Results saved to ", output_file, "\n")
-    
-    # Print number of rows written to the output file
-    cat("Number of rows written to the output file: ", nrow(analyzed_data), "\n")
-  } else {
-    cat("No data loaded. Exiting... \n")
-  }
-}
+# Perform aspect-based sentiment analysis
+aspect_results <- aspect_sentiment_analysis(data, afinn, negation_terms)
 
-# Execute main function
-main()
+# Load the 'here' package
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+library(here)
+
+# Set the working directory to where the script is located
+here::set_here()
+
+# Save results to a separate file
+write.csv(aspect_results, "aspect_based_sentiment_analysis_results.csv", row.names = FALSE)
+
+# Print summary statistics
+summary(aspect_results$Sentiment_Score)
